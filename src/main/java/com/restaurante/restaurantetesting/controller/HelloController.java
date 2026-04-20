@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HelloController {
+
     @GetMapping("hola")
     public String hola(){
         return "hola";
@@ -13,7 +14,8 @@ public class HelloController {
 
     @GetMapping("adios")
     public String adios(Model model){
-        model.addAttribute("mensaje", "Adios terricolas");
+        model.addAttribute("msn", "Adios terricolas!!");
+        model.addAttribute("plata", 100.5);
         return "adios";
     }
 }

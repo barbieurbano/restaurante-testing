@@ -16,7 +16,7 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer quantify;
+    private Integer quantity;
 
     @ToString.Exclude
     @ManyToOne

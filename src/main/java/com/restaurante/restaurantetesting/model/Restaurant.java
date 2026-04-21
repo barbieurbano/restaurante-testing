@@ -22,6 +22,7 @@ public class Restaurant {
 
     private Double averagePrice;
 
+    @Builder.Default
     @Column(columnDefinition = "BOOLEAN DEFAULT true") // Por defecto true
     private Boolean active = true;
 

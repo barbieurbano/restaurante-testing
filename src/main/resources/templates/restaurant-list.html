@@ -10,6 +10,9 @@
 <ol>
     <li th:each="restaurant : ${restaurantes}">
         <span th:text="${restaurant.name}"></span>
+        <span th:text="${restaurant.averagePrice}"></span>
+        <!-- Agregar enlace par VER RESTAURANTE-->
+        <a th:href="@{/restaurantes/{id}(id=${restaurant.id})}">Ver restaurante</a>
     </li>
 </ol>
 </body>

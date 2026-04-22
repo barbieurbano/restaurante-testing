@@ -1,24 +1,29 @@
 package com.restaurante.restaurantetesting.controller;
 
+import com.restaurante.restaurantetesting.model.Dish;
 import com.restaurante.restaurantetesting.model.Restaurant;
+import com.restaurante.restaurantetesting.repository.DishRepository;
 import com.restaurante.restaurantetesting.repository.RestaurantRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class RestaurantController {
 
     private final RestaurantRepository restaurantRepository;
-    //DishRepository
+    private final DishRepository dishRepository;
     //OrderRepository
     //EmployeeRepository
 
-    public RestaurantController(RestaurantRepository restaurantRepository) {
+
+    public RestaurantController(RestaurantRepository restaurantRepository, DishRepository dishRepository) {
         this.restaurantRepository = restaurantRepository;
+        this.dishRepository = dishRepository;
     }
 
     @GetMapping("restaurantes")
@@ -33,10 +38,15 @@ public class RestaurantController {
 
     @GetMapping("/restaurantes/{id}")
     public String restaurantDetail(@PathVariable Long id, Model model){
-        Optional<Restaurant> optional = restaurantRepository.findById(id);
+        Optional<Restaurant> restauranteOptional = restaurantRepository.findById(id);
 
-        if(optional.isPresent()){
-            model.addAttribute("restaurante", optional.get());
+        if(restauranteOptional.isPresent()){
+            model.addAttribute("restaurante", restauranteOptional.get());
+            List<Dish> platos = dishRepository.findByRestaurant_Id(id);
+            model.addAttribute("Dishes", platos);
+            //Traer y encargar empleados
+            //Traer y cargar las review
+            //
             return "restaurant-detail";
         }
         else{

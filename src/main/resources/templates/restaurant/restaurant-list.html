@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/head :: head('Restaurantes')}">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{layout/navbar :: navbar}"></nav>
+
+<main class="container flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0" th:text="${saludo}">Restaurantes</h1>
+        <span class="badge bg-secondary fs-6"
+              th:text="|${#lists.size(restaurants)} resultados|">0 resultados</span>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        <div class="col" th:each="restaurant : ${restaurants}">
+            <div class="card card-restaurant h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fa-solid fa-store text-primary me-2"></i>
+                        <span th:text="${restaurant.name}">Nombre</span>
+                    </h5>
+                    <p class="card-text">
+                                <span class="badge bg-success">
+                                    <i class="fa-solid fa-euro-sign me-1"></i>
+                                    <span th:text="${restaurant.averagePrice}">0</span>
+                                </span>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a th:href="@{/restaurants/{id}(id=${restaurant.id})}"
+                       class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fa-regular fa-eye me-1"></i> Ver restaurante
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/footer :: footer}"></footer>
+<script th:replace="~{layout/footer :: scripts}"></script>
+
+</body>
+</html>

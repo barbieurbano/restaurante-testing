@@ -27,7 +27,7 @@ public class Review {
     private Integer rating;
 
     @Builder.Default
-    private LocalDateTime date = LocalDateTime.now();
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     //asociaciones
     @ManyToOne

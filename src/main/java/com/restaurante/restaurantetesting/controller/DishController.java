@@ -15,11 +15,18 @@ public class DishController {
     private final DishRepository dishRepository;
     private final ReviewRepository reviewRepository;//una vez se crea el repositorio no va a cambiar por eso el final
 
+    @GetMapping("dishes")
+    public String dishes(Model model){
+        model.addAttribute("dishes", dishRepository.findAll());
+        return "dishes/dish-list";
+    }
+
+    //traemos la entidad y las asociaciones que tenga podemos tener alergenos, ingredientes, photos
     @GetMapping("dish/{id}") // Alomejor para un ADMIN si le sirve ver todas las reviews
     public String dishDetail(Model model, @PathVariable  Long id){
         model.addAttribute("dish", dishRepository.findById(id).orElseThrow());
         model.addAttribute("reviews", reviewRepository.findByDish_IdOrderByCreationDateDesc(id));
-        return "";
+        return "dishes/dish-detail";
     }
 }
 

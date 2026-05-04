@@ -1,6 +1,7 @@
 package com.restaurante.restaurantetesting.repository;
 
 import com.restaurante.restaurantetesting.model.Order;
+import com.restaurante.restaurantetesting.model.OrderLine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,4 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // JPQL
     @Query("select sum(lineaPedido.dish.price * lineaPedido.quantity) from OrderLine lineaPedido where lineaPedido.order.id = ?1")
     Double calculateTotalPrice(Long orderId);
+
+
 }

@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest // Activa spring para el testing, Esto suele ser lento
 @AutoConfigureMockMvc //Para poder usar el objeto mockMvc(clase de utilidad), lo habilita y configura
-    //@Transactional Descarta los cambios introducidos para que el siguiente TEST comience limpio
+//@Transactional Descarta los cambios introducidos para que el siguiente TEST comience limpio
 class RestaurantControllerTest {
     //restaurant repository, si no nos daria un nullExpointerExcepction
     @Autowired

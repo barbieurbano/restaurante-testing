@@ -31,14 +31,14 @@ public class RestaurantController {
 
         //Ejemplos DATOS (porque teniamos datos en testing solamente)
 
-        model.addAttribute("restaurants", restaurantRepository.findAll());
+        model.addAttribute("restaurants", restaurantRepository.findAllByActiveTrue());
         model.addAttribute("saludo", "Bienvenido a la lista de restaurantes");
         return "restaurant/restaurant-list";
     }
 
     @GetMapping("/restaurants/{id}")
     public String restaurantDetail(@PathVariable Long id, Model model){
-        Optional<Restaurant> restauranteOptional = restaurantRepository.findById(id);
+        Optional<Restaurant> restauranteOptional = restaurantRepository.findByAndActiveTrue(id);
 
         if(restauranteOptional.isPresent()){
 
@@ -56,4 +56,30 @@ public class RestaurantController {
             return "redirect:/restaurants";
         }
     }
+
+    @GetMapping("/restaurants/deactivate/{id}")
+    public String deactivateRestaurant(@PathVariable Long id, Model model){
+        //El optional porque puede no existir, entonces para que no te de nulo
+//        Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);
+//        if (restaurantOptional.isPresent()){
+//            Restaurant restaurant =  restaurantOptional.get();
+//            restaurant.setActive(false);
+//            restaurantRepository.save(restaurant);
+//        }
+//        return "redirect:/restaurants";
+
+        //Forma 2(optional)
+
+        restaurantRepository.findById(id).ifPresent(restaurant -> {
+            restaurant.setActive(false);
+            restaurantRepository.save(restaurant);
+        });
+        return "redirect:/restaurants";
+
+    }
+    //@GetMapping("bookings/confirm/{id}")
+    //@GetMapping("bookings/cancel")
+
+
+
 }

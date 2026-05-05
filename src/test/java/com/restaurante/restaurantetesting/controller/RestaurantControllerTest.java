@@ -29,6 +29,7 @@ class RestaurantControllerTest {
     @Autowired
     MockMvc mockMvc; // hay que hacerle una autowired porque hay que inyectarlo, lanza peticiones al controlador
 
+    Restaurant restaurantToDeactivate;
     @BeforeEach
     void setUp() {
         //Crear datos DEMO con el setUp que ya hemos visto, tenemos que comentar los datos que pusimos en MAIN
@@ -39,7 +40,21 @@ class RestaurantControllerTest {
                 Restaurant.builder().name("Don Pepe").averagePrice(15.6).build(),
                 Restaurant.builder().name("Los tres mosqueteros").averagePrice(13.8).build()
         ));
+        restaurantToDeactivate = restaurantRepository.save(Restaurant
+                .builder().active(true).name("El bar de Moe").build());
 
+    }
+    //Queremos verificar que sigue existiendo en BD pero que ahora esta en active = false, el orElse lo que hace es que si de por algun motivo se elimina en el controlador, que falle y te lo indique
+    @Test
+    void deactivateRestaurant() throws Exception{
+        assertTrue(restaurantToDeactivate.getActive());
+        
+        mockMvc.perform(get("/restaurants/deactivate/" + restaurantToDeactivate.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/restaurants"));
+        //Traer restaurant de DB y comprobar que active es false
+        Restaurant restaurantDB = restaurantRepository.findById(restaurantToDeactivate.getId()).orElseThrow();
+        assertFalse(restaurantDB.getActive());
     }
 
     @Test
@@ -62,4 +77,6 @@ class RestaurantControllerTest {
     void restaurantsEmpty(){
         //mockMvc.perform();
     }
+    //
+
 }

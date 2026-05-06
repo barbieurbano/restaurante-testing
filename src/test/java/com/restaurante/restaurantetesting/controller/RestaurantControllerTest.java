@@ -1,6 +1,7 @@
 package com.restaurante.restaurantetesting.controller;
 
 import com.restaurante.restaurantetesting.model.Restaurant;
+import com.restaurante.restaurantetesting.model.enums.FoodType;
 import com.restaurante.restaurantetesting.repository.RestaurantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,20 +36,63 @@ class RestaurantControllerTest {
         //Crear datos DEMO con el setUp que ya hemos visto, tenemos que comentar los datos que pusimos en MAIN
         restaurantRepository.deleteAll();
         restaurantRepository.saveAll(List.of(
-                Restaurant.builder().name("Los pinxitos").averagePrice(32.5).build(),
-                Restaurant.builder().name("Sushi Bialet Masse").averagePrice(20.4).build(),
-                Restaurant.builder().name("Don Pepe").averagePrice(15.6).build(),
-                Restaurant.builder().name("Los tres mosqueteros").averagePrice(13.8).build()
+                Restaurant.builder().name("Los pinxitos").averagePrice(32.5).foodType(FoodType.ARGENTINIAN).build(),
+                Restaurant.builder().name("Sushi Bialet Masse").averagePrice(20.4).foodType(FoodType.JAPANESE).build(),
+                Restaurant.builder().name("Don Pepe").averagePrice(15.6).foodType(FoodType.MEXICAN).build(),
+                Restaurant.builder().name("Los tres mosqueteros").averagePrice(13.8).foodType(FoodType.SPANISH).build(),
+                Restaurant.builder().name("KFC").averagePrice(15.0).foodType(FoodType.ARGENTINIAN).build(),
+                Restaurant.builder().name("Bar los gallegos").averagePrice(18.0).foodType(FoodType.ARGENTINIAN).build(),
+                Restaurant.builder().name("La avenida").averagePrice(35.0).foodType(FoodType.SPANISH).build()
         ));
         restaurantToDeactivate = restaurantRepository.save(Restaurant
                 .builder().active(true).name("El bar de Moe").build());
 
     }
+    @Test
+    void filterRestaurantsByPrice() throws Exception {
+        mockMvc.perform(get("/restaurants").param("price", "30"))
+                .andExpect(model().attribute("restaurants", hasSize(4)));
+    }
+
+    @Test
+    void filterRestaurantsByTitle() throws Exception {
+        mockMvc.perform(get("/restaurants").param("title", "burger"))
+                .andExpect(model().attribute("restaurants", hasSize(4)));
+    }
+
+    @Test
+    void filterRestaurantsByFoodType() throws Exception {
+        mockMvc.perform(get("/restaurants").param("foodType", "ARGENTINIAN"))
+                .andExpect(model().attribute("restaurants", hasSize(3)));
+    }
+
+    @Test
+    void filterRestaurantsByPriceAndTitle() throws Exception {
+        mockMvc.perform(get("/restaurants").param("title", "burger").param("price", "8"))
+                .andExpect(model().attribute("restaurants", hasSize(1)));
+    }
+    @Test
+    void createNewRestaurant() throws Exception{
+        //count restaurantes
+        long before = restaurantRepository.count();
+        //mockMvc enviar restaurante nuevo a controller
+        mockMvc.perform(post("/restaurants")
+                .param("name","Restaurante Test")
+                .param("averagePrice", "20.5")
+                .param("foodType", "SPANISH"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/restaurants"));
+
+        //count restaurantes tiene que haber un nuevo restaurant en BD
+        long after = restaurantRepository.count();
+        assertEquals(before + 1, after);
+    }
+
     //Queremos verificar que sigue existiendo en BD pero que ahora esta en active = false, el orElse lo que hace es que si de por algun motivo se elimina en el controlador, que falle y te lo indique
     @Test
     void deactivateRestaurant() throws Exception{
         assertTrue(restaurantToDeactivate.getActive());
-        
+
         mockMvc.perform(get("/restaurants/deactivate/" + restaurantToDeactivate.getId()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/restaurants"));

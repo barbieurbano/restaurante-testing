@@ -51,9 +51,9 @@ public class DataInitializer implements CommandLineRunner {
         var review6 = reviewRepository.save(Review.builder().title("OK").rating(4).dish(p1).restaurant(r1).build());
 
         //Pedidos y lineas pedido
-        var order1 = orderRepository.save(Order.builder().numPeople(2).tableNumber(1).totalPrice(30.0).status(OrderStatus.PENDIENTE).restaurant(r1).build());
-        var order2 = orderRepository.save(Order.builder().numPeople(4).tableNumber(2).totalPrice(60.0).status(OrderStatus.PAGADO).restaurant(r1).build());
-        var order3 = orderRepository.save(Order.builder().numPeople(6).tableNumber(3).totalPrice(70.0).status(OrderStatus.PENDIENTE).restaurant(r1).build());
+        var order1 = orderRepository.save(Order.builder().numPeople(2).tableNumber(1).totalPrice(30.0).status(OrderStatus.PENDING).restaurant(r1).build());
+        var order2 = orderRepository.save(Order.builder().numPeople(4).tableNumber(2).totalPrice(60.0).status(OrderStatus.FINISHED).restaurant(r1).build());
+        var order3 = orderRepository.save(Order.builder().numPeople(6).tableNumber(3).totalPrice(70.0).status(OrderStatus.PENDING).restaurant(r1).build());
 
         var line1 = orderLineRepository.save(OrderLine.builder().quantity(2).dish(p1).order(order1).build());
         var line2 = orderLineRepository.save(OrderLine.builder().quantity(1).dish(p2).order(order1).build());

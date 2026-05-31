@@ -55,7 +55,7 @@ class OrderRepositoryTest {
         assertNotNull(order1.getId());
         assertNotNull(order1.getDate());
         assertEquals(LocalDateTime.now().toLocalDate(),order1.getDate().toLocalDate());
-        assertEquals(OrderStatus.PENDIENTE, order1.getStatus());
+        assertEquals(OrderStatus.PENDING, order1.getStatus());
     }
 
     @Test

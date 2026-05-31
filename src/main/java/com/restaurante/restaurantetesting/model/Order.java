@@ -30,7 +30,16 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private OrderStatus status = OrderStatus.PENDIENTE;
+    private OrderStatus status = OrderStatus.PENDING;
+
+    @Column(length = 500)
+    private String userSuggestions;
+
+    private Double tip;
+
+    @ToString.Exclude
+    @ManyToOne
+    private User user;
 
     @ToString.Exclude
     @ManyToOne

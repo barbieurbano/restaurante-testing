@@ -48,7 +48,7 @@ public class OrderControllerTest {
         ensalada = dishRepo.save(Dish.builder().name("Ensalada").price(10d).restaurant(restaurant).build());
         lentejas = dishRepo.save(Dish.builder().name("Lentejas").price(15d).restaurant(restaurant).build());
         flan = dishRepo.save(Dish.builder().name("Flan").price(5d).restaurant(restaurant).build());
-        order = orderRepo.save(Order.builder().restaurant(restaurant).status(OrderStatus.PENDIENTE).numPeople(2).build());
+        order = orderRepo.save(Order.builder().restaurant(restaurant).status(OrderStatus.PENDING).numPeople(2).build());
     }
 
     //Las operaciones CRUD si son obligatorios los test, list, detail y create

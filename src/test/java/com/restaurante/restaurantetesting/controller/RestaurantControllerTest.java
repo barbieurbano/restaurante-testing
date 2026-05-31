@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -50,6 +50,9 @@ class RestaurantControllerTest {
         ));
         restaurantToDeactivate = restaurantRepository.save(Restaurant
                 .builder().active(true).name("El bar de Moe").build());
+
+        restaurantToEdit = restaurantRepository.save(Restaurant
+                .builder().active(true).name("La Tablita").averagePrice(25.0).foodType(FoodType.ARGENTINIAN).build());
 
     }
     @Test
@@ -127,10 +130,15 @@ class RestaurantControllerTest {
     void restaurantsEmpty(){
         //mockMvc.perform();
     }
-    //
+
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void editRestaurant() throws Exception{
-        Assertions.fail("Pendiente test editar restaurante");
+        mockMvc.perform(get("/restaurants/edit/" + restaurantToEdit.getId())) //pide el formulario de edición de ese restaurante (no es assert).
+                .andExpect(status().isOk()) //respondió 200 (la plantilla renderizó sin error).
+                .andExpect(view().name("restaurants/restaurant-form")) //devolvió la vista del formulario (la que acabás de crear).
+                .andExpect(model().attributeExists("restaurant")) //el modelo trae el restaurante a editar (para precargar el form).
+                .andExpect(model().attribute("restaurant", hasProperty("id", is(restaurantToEdit.getId())))); //ese restaurante del modelo es el correcto (su id coincide con el quepediste), necesitabamos que se ADMIN
     }
 
 }

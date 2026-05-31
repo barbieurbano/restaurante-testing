@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/head :: head('Formulario plato')}">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{layout/navbar :: navbar}"></nav>
+
+<main class="container flex-grow-1">
+    <h1> Formulario plato</h1>
+
+<!--    Faltaria el fomulario de plato, el object viene del controlador-->
+    <form th:action="@{dishes}" method="post" th:object="${dish}">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="mb-3">
+            <label class="form-label" for="name"> Nombre del plato </label>
+            <input id="name" type="text" class="form-control" th:field="*{name}" placeholder="Lentejas" maxlength="255" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="description">Descripcion del plato</label>
+            <textarea class="form-control" id="description"
+            th:field="*{description}" rows="3" maxlength="500" ></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="price">Precio</label>
+            <input id="price" type="number" class="form-control"
+            th:field="*{price}" min="0" required>
+        </div>
+
+<!--        DishType type-->
+        <div>
+            <label class="form-label" for="type">Tipo de plato</label>
+<!--            Itera sobre las enums o sobre los restaurantes-->
+            <select id="type" th:field="*{type}" class="form-select">
+<!--                ATENCION CON ESTE COMO ES VACIO NO LE PONEMOS TH EN VALUE-->
+                <option value=""></option>
+                <option
+                        th:each="type" : ${T(com.restaurante.restaurantetesting.model.enums.DishType).values()}}
+                        th:value="${type}"
+                        th:text="${type}">
+                </option>
+            </select>
+        </div>
+<!--        Restaurant restaurant-->
+
+        <div>
+            <label class="form-label" for="restaurant">Restaurante</label>
+<!--            AQUI VA LA ASOCIACION MANYTOONE CON RESTAURANTE-->
+            <select id="restaurant" class="form-select" th:field="*{restaurant}">
+                <option value=""></option>
+                <option
+                        th:each="restaurant: ${restaurants}"
+                        th:value="${restaurant.id}"
+                        th:text="${restaurant.id + ' - ' + restaurant.name}">
+            </select>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+
+    </form>
+
+</main>
+
+<footer th:replace="~{layout/footer :: footer}"></footer>
+<script th:replace="~{layout/footer :: scripts}"></script>
+
+</body>
+</html>

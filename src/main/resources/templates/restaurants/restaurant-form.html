@@ -34,6 +34,26 @@
         </div>
 
         <div class="mb-3">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea id="description" class="form-control" th:field="*{description}" rows="4" maxlength="500"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="date" class="form-label">Fecha de apertura</label>
+            <input type="date" class="form-control" id="date" th:field="*{date}">
+        </div>
+
+        <div class="mb-3">
+            <label for="city" class="form-label">Ciudad</label>
+            <select class="form-select" id="city" th:field="*{city}">
+                <option value="">Seleccionar ciudad</option>
+                <option th:value="'Madrid'">Madrid</option>
+                <option th:value="'Barcelona'">Barcelona</option>
+                <option th:value="'Málaga'">Málaga</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
             <label for="foodType" class="form-label">Tipo de comida</label>
             <select class="form-select" id="foodType" th:field="*{foodType}">
                 <option value="">Seleccionar tipo</option>

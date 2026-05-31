@@ -3,6 +3,9 @@ package com.restaurante.restaurantetesting.model;
 import com.restaurante.restaurantetesting.model.enums.FoodType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter // lombok
@@ -19,6 +22,16 @@ public class Restaurant {
 
     @Column(unique = true)
     private String name;
+
+    @Column(length = 500)
+    private String description;
+
+    private Integer numberEmployees;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) // formato yyyy-MM-dd
+    private LocalDate date = LocalDate.now();
+
+    private String city;
 
     private Double averagePrice;
 

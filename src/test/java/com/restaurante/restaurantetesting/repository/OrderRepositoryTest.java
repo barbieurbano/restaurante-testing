@@ -51,7 +51,7 @@ class OrderRepositoryTest {
         List<Order> pedidos = orderRepository.findByRestaurantId(restaurante1.getId());
         assertEquals(1, pedidos.size());
     }
-
+//REVISAR ESTO
     @Test
     void calculateTotalPrice(){
         Double totalPrice =  orderRepository.calculateTotalPrice(order1.getId());

@@ -54,13 +54,13 @@ class EmployeeRepositoryTest {
         assertTrue(employeeRepository.existsById(empleado1.getId()));
     }
 
+//Al buscar un empleado por su id, lo encuentra y trae sus datos correcto
     @Test
     void findById(){
-        Optional<Employee> empleadoOptional = employeeRepository.findById(1L);
-        assertTrue(empleadoOptional.isPresent());
-
+        Optional<Employee> empleadoOptional = employeeRepository.findById(empleado1.getId());
+        assertTrue(empleadoOptional.isPresent()); //confirma que findById encontró algo (el Optional no está vacío).
         Employee empleado = empleadoOptional.get();
-        assertEquals("M18", empleado1.getNif());
+        assertEquals("M18", empleado.getNif()); //confirma que el empleado recuperado tiene el NIF esperado.
     }
 
     @Test
@@ -103,19 +103,20 @@ class EmployeeRepositoryTest {
         assertEquals(4, employeeRepository.count());
     }
 
+    //borrar un empleado realmente lo elimina y deja uno menos
     @Test
     void deleteByID(){
         //Comprobar que SI EXISTE el empleado 1: existById
-        assertTrue(employeeRepository.existsById(1L));
+        assertTrue(employeeRepository.existsById(empleado1.getId())); //ANTES de borrar, confirma que el empleado sí existe.
         long numeroEmpleadoAntes = employeeRepository.count();
 
         //Borrarlo: con deleteById o delete
-        employeeRepository.deleteById(1L);
+        employeeRepository.deleteById(empleado1.getId());
 
         //comporbar que NO EXISTE el empleado 1
-        assertFalse(employeeRepository.existsById(1L));
+        assertFalse(employeeRepository.existsById(empleado1.getId())); //DESPUES de borrar, confirma que ya no existe.
         long numeroEmpleadosDespues = employeeRepository.count();
-        assertEquals(numeroEmpleadoAntes - 1, numeroEmpleadosDespues);
+        assertEquals(numeroEmpleadoAntes - 1, numeroEmpleadosDespues); //CONFIRMA que la cantidad bajó exactamente en 1 (no borró de más ni de menos).
     }
 
     @Test
@@ -193,11 +194,15 @@ class EmployeeRepositoryTest {
         employeeRepository.deleteAll();
         employeeRepository.save(Employee.builder().nif("1").level(WorkLevel.JUNIOR).build());
         employeeRepository.save(Employee.builder().nif("2").level(WorkLevel.JUNIOR).build());
-        employeeRepository.save(Employee.builder().nif("3").level(WorkLevel.JUNIOR).build());
-        employeeRepository.save(Employee.builder().nif("4").level(WorkLevel.JUNIOR).build());
+        employeeRepository.save(Employee.builder().nif("3").level(WorkLevel.SENIOR).build());
+        employeeRepository.save(Employee.builder().nif("4").level(WorkLevel.SENIOR).build());
 
+        //PARA probar un filtro, necesitás datos que NO cumplan la condición. Si los 4 son JUNIOR, el filtro
+        // podría estar roto (devolver ALL) y el test no se daría cuenta.
+        // Con 2 JUNIOR + 2 SENIOR, el assertEquals(2, ...) prueba de verdad que el filtro separa
+        // JUNIOR de SENIOR.
         List<Employee> juniors = employeeRepository.findAllByLevel(WorkLevel.JUNIOR);
-        assertEquals(2, juniors.size());
+        assertEquals(2, juniors.size()); // CONFIRMA que el filtro devolvió exactamente los 2 JUNIOR (y dejó afuera los 2 SENIOR)
 
         //siempre es mejor que filtre la BD para no traer TODOS los objetos a java
 

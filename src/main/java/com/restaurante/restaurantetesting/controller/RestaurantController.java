@@ -42,7 +42,7 @@ public class RestaurantController {
 //busca UN restaurante activo por id; si existe, carga sus platos y reseñas y muestra el detalle; si no existe, redirige a la lista.
     @GetMapping("/restaurants/{id}")
     public String restaurantDetail(@PathVariable Long id, Model model){
-        Optional<Restaurant> restauranteOptional = restaurantRepository.findByAndActiveTrue(id);
+        Optional<Restaurant> restauranteOptional = restaurantRepository.findByIdAndActiveTrue(id);
 
         if(restauranteOptional.isPresent()){
 

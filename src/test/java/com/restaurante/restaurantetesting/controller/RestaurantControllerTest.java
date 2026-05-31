@@ -3,12 +3,15 @@ package com.restaurante.restaurantetesting.controller;
 import com.restaurante.restaurantetesting.model.Restaurant;
 import com.restaurante.restaurantetesting.model.enums.FoodType;
 import com.restaurante.restaurantetesting.repository.RestaurantRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +34,7 @@ class RestaurantControllerTest {
     MockMvc mockMvc; // hay que hacerle una autowired porque hay que inyectarlo, lanza peticiones al controlador
 
     Restaurant restaurantToDeactivate;
+    Restaurant restaurantToEdit;
     @BeforeEach
     void setUp() {
         //Crear datos DEMO con el setUp que ya hemos visto, tenemos que comentar los datos que pusimos en MAIN
@@ -51,13 +55,13 @@ class RestaurantControllerTest {
     @Test
     void filterRestaurantsByPrice() throws Exception {
         mockMvc.perform(get("/restaurants").param("price", "30"))
-                .andExpect(model().attribute("restaurants", hasSize(4)));
+                .andExpect(model().attribute("restaurants", hasSize(5)));
     }
 
     @Test
     void filterRestaurantsByTitle() throws Exception {
-        mockMvc.perform(get("/restaurants").param("title", "burger"))
-                .andExpect(model().attribute("restaurants", hasSize(4)));
+        mockMvc.perform(get("/restaurants").param("title", "los"))
+                .andExpect(model().attribute("restaurants", hasSize(3)));
     }
 
     @Test
@@ -68,15 +72,16 @@ class RestaurantControllerTest {
 
     @Test
     void filterRestaurantsByPriceAndTitle() throws Exception {
-        mockMvc.perform(get("/restaurants").param("title", "burger").param("price", "8"))
+        mockMvc.perform(get("/restaurants").param("title", "los").param("price", "15"))
                 .andExpect(model().attribute("restaurants", hasSize(1)));
     }
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void createNewRestaurant() throws Exception{
         //count restaurantes
         long before = restaurantRepository.count();
         //mockMvc enviar restaurante nuevo a controller
-        mockMvc.perform(post("/restaurants")
+        mockMvc.perform(post("/restaurants").with(csrf())
                 .param("name","Restaurante Test")
                 .param("averagePrice", "20.5")
                 .param("foodType", "SPANISH"))
@@ -89,6 +94,7 @@ class RestaurantControllerTest {
     }
 
     //Queremos verificar que sigue existiendo en BD pero que ahora esta en active = false, el orElse lo que hace es que si de por algun motivo se elimina en el controlador, que falle y te lo indique
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void deactivateRestaurant() throws Exception{
         assertTrue(restaurantToDeactivate.getActive());
@@ -109,11 +115,11 @@ class RestaurantControllerTest {
         //La peticion --> localhost:8080/restaurantes
         //Perform ejecuta una peticion y devuelve un tipo que permite encadenar acciones seguidas como hacer asserciones(de que esperar una respuesta), suelen ser get(es el unico que hemos visto),put, post
         //Patron Factory
-        mockMvc.perform(get("/restaurantes"))
+        mockMvc.perform(get("/restaurants"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("restaurant-list"))
-                .andExpect(model().attributeExists("restaurantes"))
-                .andExpect(model().attribute("restaurantes", hasSize(4)));
+                .andExpect(view().name("restaurants/restaurant-list"))
+                .andExpect(model().attributeExists("restaurants"))
+                .andExpect(model().attribute("restaurants", hasSize(8)));
 
     }
 
@@ -122,5 +128,9 @@ class RestaurantControllerTest {
         //mockMvc.perform();
     }
     //
+    @Test
+    void editRestaurant() throws Exception{
+        Assertions.fail("Pendiente test editar restaurante");
+    }
 
 }

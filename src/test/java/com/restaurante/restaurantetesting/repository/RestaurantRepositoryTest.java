@@ -121,33 +121,34 @@ class RestaurantRepositoryTest {
         assertEquals(25.5, restaurantFromDB.getAveragePrice());
     }
 
+//El test sirve para comprobar que ese métdo responde bien en los dos casos: cuando no existe y cuando sí existe.
     @Test
     void existByIdTest(){
-        //Buscar un restaurante que NO EXISTE
+        //Buscar un restaurante que NO EXISTE,  La BD está vacía todavía. Preguntás "¿existe el id 1?" → devuelve false. Como esperabas false, assertFalse pasa. Estás probando el caso negativo.
         //Opcion 1: Con assert directamente
         assertFalse(restaurantRepository.existsById(1L));
 
-        //Opcion 2: Lo guardo en una variable primero, por si lo quiero usar en más lugares de mi programa
+        //Opcion 2: Lo guardo en una variable primero, por si lo quiero usar en más lugares de mi programa.
+        //guardando el resultado en una variable primero. Tu profe lo puso como "opción 2" solo para mostrar el estilo: a veces te
+        //conviene guardar el boolean en una variable por si lo querés reutilizar.
         boolean restauranteExiste = restaurantRepository.existsById(1L);
         assertFalse(restauranteExiste);
 
-        //Buscar un restaurante que SI EXISTE
+        //Buscar un restaurante que SI EXISTE, Creás un restaurante y lo guardás. A partir de acá sí existe algo en la BD. Ojo: save() devuelve el objeto ya con su id autogenerado
+        //(por eso reasignás restaurante = ...).
         Restaurant restaurante = new Restaurant("Fuertecabra", 35.4);
         restaurante = restaurantRepository.save(restaurante);
 
-        //Comprobamos que SI EXISTE el restaurante que acabamos de crear usando exists
-        assertTrue(restaurantRepository.existsById(1L));
+        //Comprobamos que SI EXISTE el restaurante que acabamos de crear usando exists,  Acá preguntás por el id real del restaurante que acabás de guardar
         assertTrue(restaurantRepository.existsById(restaurante.getId()));
 
-        if(restaurantRepository.existsById(1L)){
+        //NO ES UN TEST,  Es solo un ejemplo para mostrar cómo usarías existsById dentro de la lógica de un programa real (decidir algo según
+        //  si existe o no)
+        if(restaurantRepository.existsById(restaurante.getId())){
             System.out.println("Buenas, ¿Que quieres comer hoy?");
         }
         else{
             System.out.println("Lo sentimos, está cerrado");
         }
-
     }
-
-
-
 }

@@ -3,6 +3,7 @@ package com.restaurante.restaurantetesting.controller;
 import com.restaurante.restaurantetesting.model.Dish;
 import com.restaurante.restaurantetesting.model.Restaurant;
 import com.restaurante.restaurantetesting.model.Review;
+import com.restaurante.restaurantetesting.model.enums.FoodType;
 import com.restaurante.restaurantetesting.repository.DishRepository;
 import com.restaurante.restaurantetesting.repository.RestaurantRepository;
 import com.restaurante.restaurantetesting.repository.ReviewRepository;
@@ -25,17 +26,18 @@ public class RestaurantController {
     //EmployeeRepository
 
 //Pide al repositorio los restaurantes activos (filtrando por precio/título si vienen en la URL) y muestra la lista
+//El price debe ser el que indicas en la url
     @GetMapping("restaurants") //CONTROLADOR
     public String restaurants(
             Model model,
-            //El price debe ser el que indicas en la url
             @RequestParam(required = false) Double price,
-            @RequestParam(required = false) String title
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) FoodType foodType
     ){
 
         //Ejemplos DATOS (porque teniamos datos en testing solamente)
 
-        model.addAttribute("restaurants", restaurantRepository.findActiveFiltering(price, title));
+        model.addAttribute("restaurants", restaurantRepository.findActiveFiltering(price, title, foodType));
         model.addAttribute("saludo", "Bienvenido a la lista de restaurantes");
         return "restaurants/restaurant-list";
     }

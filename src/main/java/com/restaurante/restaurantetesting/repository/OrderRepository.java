@@ -14,6 +14,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // calculate total price based on order lines
     // JPQL
 
+
+    //trae los pedidos de un usuario concreto. El _ le dice a Spring que navegue la asociación user.id (pedido → user → id). Sirve para que un cliente
+    //  vea solo sus pedidos.
+    List<Order> findByUser_Id(Long id);
+
     @Query("""
       select COALESCE(sum(lineaPedido.dish.price * lineaPedido.quantity), 0.0)
       from OrderLine lineaPedido

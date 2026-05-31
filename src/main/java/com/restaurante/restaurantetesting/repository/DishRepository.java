@@ -12,6 +12,9 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
 
     List<Dish> findByPriceLessThanEqual(Double price);
 
+    //trae los platos de un restaurante ordenados por precio. Se usa en el detalle del pedido, para mostrarle al usuario la carta y que elija platos.
+    List<Dish> findByRestaurantIdOrderByPrice(Long id);
+
     @Query("select d from Dish d order by d.price") // asc por defecto
     List<Dish> findOrderedByPriceAsc();
 }

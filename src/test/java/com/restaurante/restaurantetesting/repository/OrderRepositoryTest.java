@@ -2,6 +2,8 @@ package com.restaurante.restaurantetesting.repository;
 
 import com.restaurante.restaurantetesting.model.Order;
 import com.restaurante.restaurantetesting.model.Restaurant;
+import com.restaurante.restaurantetesting.model.Dish;
+import com.restaurante.restaurantetesting.model.OrderLine;
 import com.restaurante.restaurantetesting.model.enums.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +23,10 @@ class OrderRepositoryTest {
     RestaurantRepository restaurantRepository;
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    DishRepository dishRepository;
+    @Autowired
+    OrderLineRepository orderLineRepository;
 
     //Declarar DATOS para las pruebas
     Restaurant restaurante1;
@@ -33,8 +39,14 @@ class OrderRepositoryTest {
 
         //CREAR y GUARDAR un pedido en BD
         order1 = orderRepository.save(Order.builder().restaurant(restaurante1).numPeople(2).tableNumber(1).build());
-        //Platos
-        //Lineas pedido orderline
+        //Platos (con precios)
+        Dish ensalada = dishRepository.save(Dish.builder().name("Ensalada").price(10.0).restaurant(restaurante1).build());
+        Dish lentejas = dishRepository.save(Dish.builder().name("Lentejas").price(15.0).restaurant(restaurante1).build());
+
+        //Lineas pedido orderline:  10*2 + 15*2 = 50
+        orderLineRepository.save(OrderLine.builder().order(order1).dish(ensalada).quantity(2).build());
+        orderLineRepository.save(OrderLine.builder().order(order1).dish(lentejas).quantity(2).build());
+
     }
 
     @Test
@@ -51,11 +63,12 @@ class OrderRepositoryTest {
         List<Order> pedidos = orderRepository.findByRestaurantId(restaurante1.getId());
         assertEquals(1, pedidos.size());
     }
-//REVISAR ESTO
+//Esto hace: pide el precio total del pedido (la suma de precio × cantidad de cada línea de pedido) y espera 50.0. Pero tu setUp() crea el pedido
+//  sin líneas ni platos (mirá los comentarios //Platos //Lineas pedido orderline que dejaste pendientes). Sin líneas, la suma da null/0, no 50.
     @Test
     void calculateTotalPrice(){
         Double totalPrice =  orderRepository.calculateTotalPrice(order1.getId());
-        assertEquals(50.0, totalPrice);
+        assertEquals(50.0, totalPrice); //confirma que la consulta suma correctamente las líneas del pedido (10×2 + 15×2). Si la consulta calculara mal, ofaltaran líneas, el número no daría 50.
     }
 
 

@@ -58,7 +58,7 @@ class RestaurantControllerTest {
     @Test
     void filterRestaurantsByPrice() throws Exception {
         mockMvc.perform(get("/restaurants").param("price", "30"))
-                .andExpect(model().attribute("restaurants", hasSize(5)));
+                .andExpect(model().attribute("restaurants", hasSize(6)));
     }
 
     @Test
@@ -70,7 +70,7 @@ class RestaurantControllerTest {
     @Test
     void filterRestaurantsByFoodType() throws Exception {
         mockMvc.perform(get("/restaurants").param("foodType", "ARGENTINIAN"))
-                .andExpect(model().attribute("restaurants", hasSize(3)));
+                .andExpect(model().attribute("restaurants", hasSize(4)));
     }
 
     @Test
@@ -122,7 +122,7 @@ class RestaurantControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("restaurants/restaurant-list"))
                 .andExpect(model().attributeExists("restaurants"))
-                .andExpect(model().attribute("restaurants", hasSize(8)));
+                .andExpect(model().attribute("restaurants", hasSize(9)));
 
     }
 

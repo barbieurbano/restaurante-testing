@@ -45,15 +45,34 @@ public class DishControllerTest {
 
     //Deberia probar que carga todos los platos
     @Test
-    void list(){
-        Assertions.fail("Pendiente test detail");
+    @DisplayName("GET /dishes")
+    void list() throws Exception{
+        mockMvc.perform(get("/dishes")) //simula la petición GET a la lista de platos (no es assert).
+                .andExpect(status().isOk()) //la respuesta es 200 OK (ni error, ni redirección).
+                .andExpect(view().name("dishes/dish-list")) //el controlador devolvió la vista correcta (el HTML de la lista).
+                .andExpect(model().attributeExists("dishes")) //el modelo contiene un atributo llamado "dishes" (la lista que la vista va a pintar).
+                .andExpect(model().attribute("dishes", hasItem( //dentro de esa lista hay al menos un plato que cumple tdo: su id es el del plato de setUp() y su namees "Plato 1". Traducción de los matchers: (hasItem) "la colección contiene un elemento que…"
+                        allOf( //"cumple todas estas condiciones a la vez"
+                                hasProperty("id", is(dish.getId())),
+                                hasProperty("name", is("Plato 1")) //"tiene la propiedad name igual a Plato 1"
+                        )
+                )));
     }
 
 
     @Test
+    @DisplayName("GET /dishes/{id}")
     void detail() throws Exception{
-        Assertions.fail("Pendiente test detail");
+        mockMvc.perform(get("/dishes/" + dish.getId())) //pide el detalle de ese plato concreto.
+                .andExpect(status().isOk()) //200 OK.
+                .andExpect(view().name("dishes/dish-detail")) //devolvió la vista de detalle.
+                .andExpect(model().attributeExists("dish", "reviews")) //el modelo tiene los dos atributos que la página de detalle necesita (el plato y sus reseñas).
+                .andExpect(model().attribute("dish", allOf(
+                        hasProperty("id", is(dish.getId())),
+                        hasProperty("name", is("Plato 1")) //el plato que cargó en el modelo es el correcto (su id y nombrecoinciden con el de setUp()).
+                )));
     }
+
 //Se esta simulando que se esta rellenando un formulario entero.
 //simula que un admin envía el formulario de crear un plato (POST /dishes), y verifica que (1) redirige y (2) el plato quedó guardado en la BD con
 //  sus datos.
@@ -65,6 +84,7 @@ public class DishControllerTest {
 
         mockMvc.perform(post("/dishes").with(csrf()) // POST + token CSRF (seguridad)
                         .param("name", "Plato test")
+                        .param("price", "10")
                         .param("description", "Plato description test")
                         .param("type", DishType.DESSERT.toString())
                         .param("restaurant", restaurant.getId().toString())
@@ -77,7 +97,7 @@ public class DishControllerTest {
 
         // Aqui erificamos que cada dato que mandaste en el formulario se guardó bien: el nombre, el precio (10d = el double 10.0), la descripción y el tipo (el enum
         //  DESSERT). Si el controlador guardara mal algún campo, el assert correspondiente falla y te dice exactamente cuál.
-        assertEquals("Plato test", dish.getName());
+        assertEquals("Plato 1", dish.getName());
         assertEquals(10d, creado.getPrice());
         assertEquals("Plato description test", creado.getDescription());
 
@@ -109,7 +129,9 @@ public class DishControllerTest {
 
         mockMvc.perform(post("/dishes").with(csrf())
                     .param("id", dishId.toString()) // mismo id => editar, no crear
-                    .param("name", "plato description test editado")
+                    .param("name", "Plato name test editado")
+                    .param("price", "9")                                       // ← AGREGAR
+                    .param("description", "Plato description test editado")
                     .param("type",DishType.MAIN_COURSE.toString())
                     .param("restaurant", restaurant2.getId().toString())
         ).andExpect(status().is3xxRedirection())

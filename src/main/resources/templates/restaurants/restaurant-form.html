@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/head :: head('Formulario restaurante')}">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{layout/navbar :: navbar}"></nav>
+
+<main class="container flex-grow-1" th:with="isEdition=${restaurant.id != null}">
+    <h1 th:text="${isEdition ? 'Editar restaurante' : 'Crear restaurante'}">Formulario restaurante</h1>
+
+    <form th:action="@{/restaurants}" method="post" th:object="${restaurant}">
+
+        <div class="mb-3" th:if="${isEdition}">
+            <label class="form-label" for="id">Identificador</label>
+            <input type="text" class="form-control" id="id" th:field="*{id}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="averagePrice" class="form-label">Precio promedio</label>
+            <input type="number" step="0.01" class="form-control" id="averagePrice" th:field="*{averagePrice}" required>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="active" th:field="*{active}">
+            <label class="form-check-label" for="active">Restaurante activo</label>
+        </div>
+
+        <div class="mb-3">
+            <label for="foodType" class="form-label">Tipo de comida</label>
+            <select class="form-select" id="foodType" th:field="*{foodType}">
+                <option value="">Seleccionar tipo</option>
+                <option
+                        th:each="type : ${T(com.restaurante.restaurantetesting.model.enums.FoodType).values()}"
+                        th:value="${type}"
+                        th:text="${type.label}">
+                </option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary" th:text="${isEdition ? 'Actualizar' : 'Crear'}">Guardar</button>
+        <a href="/restaurants" class="btn btn-secondary">Cancelar</a>
+    </form>
+</main>
+
+<footer th:replace="~{layout/footer :: footer}"></footer>
+<script th:replace="~{layout/footer :: scripts}"></script>
+
+</body>
+</html>

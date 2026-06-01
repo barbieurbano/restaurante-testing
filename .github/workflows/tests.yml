@@ -1,0 +1,147 @@
+name: Tests (manual)
+
+# Solo se ejecuta cuando lo lanzas manualmente desde la pestaña Actions de GitHub
+# o vía: gh workflow run tests.yml
+#
+# Manual a propósito: hacemos +10 commits al día en este repo y no queremos
+# desperdiciar minutos de runner en cada push. Lo lanzas cuando quieres
+# validar (antes de una review, al cerrar un sprint, etc.).
+on:
+#  push:
+#    branches:
+#        - main
+  workflow_dispatch:
+
+jobs:
+  repository-tests:
+    name: Tests de repositorios (@DataJpaTest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Ejecutar *RepositoryTest
+        run: mvn -B test -Dtest='*RepositoryTest'
+
+  controller-tests:
+    name: Tests de controllers (@SpringBootTest + MockMvc)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Ejecutar *ControllerTest
+        run: mvn -B test -Dtest='*ControllerTest'
+
+  service-tests:
+    name: Tests de servicios (Unitarios con mocks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java 25 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Ejecutar *ServiceTest
+        run: mvn -B test -Dtest='*ServiceTest'
+
+  security-tests:
+    name: Tests de seguridad (rutas SecurityConfig)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java 25 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Ejecutar *SecurityTest
+        run: mvn -B test -Dtest='*SecurityTest'
+
+  coverage:
+    name: Cobertura global (JaCoCo)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25 + cache Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # -Dmaven.test.failure.ignore=true: ejecuta todos los tests aunque alguno
+      # falle, para que JaCoCo genere el report con la cobertura agregada del
+      # proyecto. Los jobs de arriba ya marcan rojo si algo se rompe.
+      - name: Ejecutar todos los tests y generar JaCoCo
+        run: mvn -B test -Dmaven.test.failure.ignore=true
+
+      - name: Subir HTML report como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          retention-days: 14
+
+      - name: Volcar resumen al step summary
+        if: always()
+        run: |
+          REPORT=target/site/jacoco/jacoco.xml
+          if [ ! -f "$REPORT" ]; then
+            echo "No se encontró $REPORT" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          parse() {
+            local type=$1
+            local covered missed total
+            covered=$(xmllint --xpath "string(/report/counter[@type='$type']/@covered)" "$REPORT")
+            missed=$(xmllint --xpath "string(/report/counter[@type='$type']/@missed)" "$REPORT")
+            covered=${covered:-0}
+            missed=${missed:-0}
+            total=$((covered + missed))
+            if [ "$total" -eq 0 ]; then
+              echo "n/a"
+            else
+              awk "BEGIN { printf \"%.2f%% (%d/%d)\", ($covered * 100) / $total, $covered, $total }"
+            fi
+          }
+
+          {
+            echo "## Cobertura global"
+            echo ""
+            echo "| Métrica | Cobertura |"
+            echo "|---|---|"
+            echo "| Instrucciones | $(parse INSTRUCTION) |"
+            echo "| Líneas        | $(parse LINE) |"
+            echo "| Ramas         | $(parse BRANCH) |"
+            echo "| Métodos       | $(parse METHOD) |"
+            echo "| Clases        | $(parse CLASS) |"
+            echo ""
+            echo "Descarga el HTML completo desde el artifact **jacoco-report** de este run."
+          } >> "$GITHUB_STEP_SUMMARY"

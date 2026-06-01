@@ -11,7 +11,7 @@
 <main class="container flex-grow-1">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0" th:text="${saludo}">Restaurantes</h1>
-        <span class="badge bg-secondary fs-6"
+        <span id="resultsCount" class="badge bg-secondary fs-6"
               th:text="|${#lists.size(restaurants)} resultados|">0 resultados</span>
     </div>
     <div class="mb-3">
@@ -45,16 +45,18 @@
                         <span th:text="${restaurant.name}">Nombre</span>
                     </h5>
                     <p class="card-text">
-                                <span class="badge bg-success">
-                                    <i class="fa-solid fa-euro-sign me-1"></i>
-                                    <span th:text="${restaurant.averagePrice}">0</span>
-                                </span>
+                                  <span class="badge bg-success">
+                                      <i class="fa-solid fa-euro-sign me-1"></i>
+                                      <span th:text="${restaurant.averagePrice}">0</span>
+                                  </span>
+                        <span class="badge bg-warning text-dark"
+                              th:text="${restaurant.foodType != null ? restaurant.foodType.label : 'Todo tipo'}">TODO</span>
                     </p>
                 </div>
                 <div class="card-footer bg-transparent border-0 pt-0">
                     <a th:href="@{/restaurants/{id}(id=${restaurant.id})}"
                        class="btn btn-outline-primary btn-sm w-100">
-                        <i class="fa-regular fa-eye me-1"></i> Ver restaurante
+                        <i class="fa-regular fa-eye me-1"></i> Ver
                     </a>
                 </div>
             </div>

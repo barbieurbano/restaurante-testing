@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/head :: head('Detalle Pedido')}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<nav th:replace="~{layout/navbar :: navbar}"></nav>
+
+<main class="container flex-grow-1 my-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a th:href="@{/orders}" class="text-decoration-none">
+                    <i class="fa-solid fa-list me-1"></i>Pedidos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Pedido #<span th:text="${order.id}"></span>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Cabecera -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="h3 mb-1">
+                        <i class="fa-solid fa-receipt text-success me-2"></i>
+                        Pedido #<span th:text="${order.id}"></span>
+                    </h1>
+                    <div class="text-muted small">
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        <span th:text="${#temporals.format(order.date, 'dd/MM/yyyy HH:mm')}"></span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                              <span class="badge fs-6 px-3 py-2"
+                                    th:classappend="${order.status.name() == 'PENDING' ? 'bg-warning text-dark' : (order.status.name() == 'IN_PROGRESS' ?
+  'bg-info text-dark' : 'bg-success')}"
+                                    th:text="${order.status.name() == 'PENDING' ? 'Pendiente' : (order.status.name() == 'IN_PROGRESS' ? 'En curso' :
+  'Finalizado')}"></span>
+
+                    <a th:if="${order.status.name() != 'FINISHED'}"
+                       th:href="@{/orders/{id}/finish(id=${order.id})}"
+                       class="btn btn-success btn-sm">
+                        <i class="fa-solid fa-coins me-1"></i> Finalizar pedido
+                    </a>
+
+                    <a th:href="@{/orders}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de información -->
+    <div class="row g-3 mb-4">
+
+        <!-- Información del pedido -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-clipboard-list me-2"></i>Pedido
+                    </h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-hashtag me-2"></i>ID</span>
+                        <span class="fw-semibold" th:text="${order.id}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-utensils me-2"></i>Mesa</span>
+                        <span class="fw-semibold" th:text="${order.tableNumber}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-people-group me-2"></i>Comensales</span>
+                        <span class="fw-semibold" th:text="${order.numPeople}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-coins me-2"></i>Propina</span>
+                        <span class="fw-semibold">
+                                      <span th:text="${#numbers.formatDecimal(order.tip, 1, 2)}"></span> €
+                                  </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Información del restaurante -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-store me-2"></i>Restaurante
+                    </h5>
+                </div>
+                <div class="card-body pb-2">
+                    <h5 class="card-title mb-1">
+                        <a th:href="@{/restaurants/{id}(id=${order.restaurant.id})}"
+                           class="text-decoration-none link-dark"
+                           th:text="${order.restaurant.name}"></a>
+                    </h5>
+                    <span class="badge bg-light text-dark border"
+                          th:if="${order.restaurant.foodType != null}"
+                          th:text="${order.restaurant.foodType.label}"></span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-euro-sign me-2"></i>Precio medio</span>
+                        <span class="fw-semibold">
+                                      <span th:text="${#numbers.formatDecimal(order.restaurant.averagePrice, 1, 2)}"></span> €
+                                  </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-users me-2"></i>Empleados</span>
+                        <span class="fw-semibold" th:text="${order.restaurant.numberEmployees}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-calendar-day me-2"></i>Apertura</span>
+                        <span class="fw-semibold"
+                              th:text="${#temporals.format(order.restaurant.date, 'dd/MM/yyyy')}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-circle-check me-2"></i>Estado</span>
+                        <span th:if="${order.restaurant.active}" class="badge bg-success">Activo</span>
+                        <span th:unless="${order.restaurant.active}" class="badge bg-secondary">Inactivo</span>
+                    </li>
+                </ul>
+                <div class="card-body pt-2">
+                    <a th:href="@{/restaurants/{id}(id=${order.restaurant.id})}"
+                       class="btn btn-outline-danger btn-sm w-100">
+                        <i class="fa-regular fa-eye me-1"></i> Ver restaurante
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del usuario (datos ficticios: la entidad User aún no existe) -->
+        <div class="col-md-4" th:if="${order.user != null}">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-user me-2"></i>Cliente
+                    </h5>
+                </div>
+                <div class="card-body text-center pb-2">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2"
+                         style="width: 64px; height: 64px;">
+                        <i class="fa-solid fa-user fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-0" th:text="${order.user.username}"></h5>
+                    <p class="text-muted small mb-0">
+                        <i class="fa-solid fa-crown text-warning me-1"></i>Cliente VIP
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-envelope me-2"></i>Email</span>
+                        <span class="fw-semibold small" th:text="${order.user.email}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-phone me-2"></i>ID</span>
+                        <span class="fw-semibold" th:text="${order.user.id}"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-receipt me-2"></i>Pedidos</span>
+                        <span class="fw-semibold">12</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Líneas del pedido -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fa-solid fa-utensils me-2"></i>Líneas del pedido
+            </h5>
+            <span class="badge bg-light text-dark"
+                  th:text="|${#lists.size(orderLines)} líneas|"></span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(orderLines)}" class="card-body text-center text-muted py-5">
+            <i class="fa-regular fa-folder-open fa-2x mb-2 d-block"></i>
+            <p class="mb-0">Este pedido no tiene líneas todavía</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(orderLines)}" class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th class="ps-3">#</th>
+                    <th>Plato</th>
+                    <th>Tipo</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-end">Subtotal</th>
+                    <th class="text-center pe-3">Ver</th> <!-- Ver -->
+                    <th class="text-center pe-3" th:if="${order.status.name() != 'FINISHED'}">Modificar</th> <!-- modificar cantidad -->
+                    <th class="text-center pe-3" th:if="${order.status.name() != 'FINISHED'}">Eliminar</th> <!-- eliminar linea pedido -->
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="line, iter : ${orderLines}">
+                    <td class="ps-3 text-muted" th:text="${iter.count}"></td>
+                    <td>
+                        <div class="fw-semibold">
+                            <a th:href="@{/dishes/{id}(id=${line.dish.id})}"
+                               class="text-decoration-none link-dark"
+                               th:text="${line.dish.name}"></a>
+                        </div>
+                        <div class="small text-muted text-truncate" style="max-width: 320px;"
+                             th:text="${line.dish.description}"></div>
+                    </td>
+                    <td>
+                                      <span class="badge bg-light text-dark border"
+                                            th:if="${line.dish.type != null}"
+                                            th:text="${line.dish.type}"></span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-secondary rounded-pill" th:text="${line.quantity}"></span>
+                    </td>
+                    <td class="text-end">
+                        <span th:text="${#numbers.formatDecimal(line.dish.price, 1, 2)}"></span> €
+                    </td>
+                    <td class="text-end fw-semibold"
+                        th:text="|${#numbers.formatDecimal(line.quantity * line.dish.price, 1, 2)} €|"></td>
+                    <td class="text-center">
+                        <a th:href="@{/dishes/{id}(id=${line.dish.id})}"
+                           class="btn btn-sm btn-outline-primary"
+                           title="Ver plato">
+                            <i class="fa-regular fa-eye"></i>
+                        </a>
+                    </td>
+                    <td th:if="${order.status.name() != 'FINISHED'}" class="text-center">
+
+                        <form th:action="@{/orders/{orderId}/lines/{lineId}(orderId=${order.id},lineId=${line.id})}"
+                              method="post" class="d-flex align-items-center justify-content-center gap-1">
+                            <input name="quantity" type="number" min="1" style="max-width: 90px;"
+                                   th:value="${line.quantity}" class="form-control form-control-sm">
+                            <button class="btn btn-sm btn-success">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </button>
+                        </form>
+
+                    </td>
+                    <td th:if="${order.status.name() != 'FINISHED'}" class="text-center">
+                        <a class="btn btn-sm btn-danger"
+                           th:href="@{/orders/{orderId}/lines/{lineId}/delete(orderId=${order.id},lineId=${line.id})}">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totales -->
+        <div class="card-footer bg-white">
+            <div class="row justify-content-end">
+                <div class="col-md-5 col-lg-4">
+                    <dl class="row mb-0">
+                        <dt class="col-7 text-muted fw-normal" th:if="${order.status.name() == 'FINISHED'}">Propina</dt>
+                        <dd class="col-5 text-end mb-1" th:if="${order.status.name() == 'FINISHED'}">
+                            <span th:text="${#numbers.formatDecimal(order.tip, 1, 2)}"></span> €
+                        </dd>
+                        <dt class="col-7 fs-5 mb-0">Total</dt>
+                        <dd class="col-5 text-end fs-5 fw-bold text-success mb-0">
+                            <span th:text="${#numbers.formatDecimal(order.totalPrice, 1, 2)}"></span> €
+                        </dd>
+                        <dt class="col-7 fs-5 mb-0" th:if="${order.status.name() == 'FINISHED'}">Suma total</dt>
+                        <dd class="col-5 text-end fs-5 fw-bold text-success mb-0" th:if="${order.status.name() == 'FINISHED'}">
+                            <span th:text="${#numbers.formatDecimal(order.totalPrice + order.tip, 1, 2)}"></span> €
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4" th:if="${order.status.name() != 'FINISHED'}">
+        <div class="card-body">
+            <h5 class="mb-3">Sección de pago</h5>
+
+            <form th:action="@{/orders/{id}/finish(id=${order.id})}" method="get"
+                  class="row align-items-end justify-content-end gap-3">
+
+                <!-- si enviamos info sensible mejor cambiar a method post -->
+                <div class="col">
+                    <label class="form-label" for="tip">Propina (€)</label>
+                    <input type="number" id="tip" name="tip" min="0"
+                           class="form-control" value="0.00" step="0.01">
+                </div>
+
+                <div class="col">
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="fa-solid fa-credit-card"></i>
+                        Pagar y finalizar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TODO Mostrar los platos a elegir para el pedido en progreso-->
+    <div th:if="${order.status.name() != 'FINISHED'}">
+        <h2 class="mt-4">Selecciona los platos deseados</h2>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="dish : ${dishes}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${dish.name}"></h5>
+                        <p class="text-muted small" th:text="${dish.description}"></p>
+                        <strong th:text="|${#numbers.formatDecimal(dish.price, 1, 2)} €|"></strong>
+                    </div>
+                    <div class="card-footer">
+
+                        <form th:action="@{/orders/{id}/lines(id=${order.id})}" method="post">
+                            <input type="hidden" name="dishId" th:value="${dish.id}">
+                            <button class="btn btn-sm btn-success">
+                                <i class="fa-solid fa-plus"></i>
+                                Añadir
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{layout/footer :: footer}"></footer>
+<script th:replace="~{layout/footer :: scripts}"></script>
+
+</body>

@@ -12,10 +12,11 @@ public class RestaurantSeleniumTest extends BaseSeleniumTest {
 
     @Test
     void restaurantList () {
+        //Para navegar, lo que viene del DRIVER viene de Selenium.
         driver.get(baseUrl + "restaurants");
-
+        //Buscar los elementos con findElement y la etiqueta de html
         assertEquals("Bienvenido a la lista de restaurantes", driver.findElement(By.tagName("h1")).getText());
-
+        //Comprubea que haya un badge qe contenga resultado.
         assertTrue(driver.findElement(By.id("resultsCount")).getText().contains("resultado"));
 
         List<WebElement> restaurants = driver.findElements(By.className("card-restaurant"));
@@ -60,5 +61,11 @@ public class RestaurantSeleniumTest extends BaseSeleniumTest {
         assertEquals(pizzeriaMal.getTitle(), secondReview.findElement(By.tagName("h5")).getText());
         assertEquals(pizzeriaMal.getContent(), secondReview.findElement(By.cssSelector(".card-text")).getText());
         assertEquals("1/5", secondReview.findElement(By.className("review-rating")).getText());
+
+        //Restaurant formulario (priemro testear las pantallas publicas, listado y detalle de plato)
+
+        //restaurant list filters
+
+
     }
 }

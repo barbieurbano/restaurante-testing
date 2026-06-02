@@ -8,7 +8,7 @@
 <main class="container flex-grow-1">
 
     <!-- Card con los datos del plato -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm" id="dishInfoCard">
         <div class="card-body">
             <h1 class="card-title mb-3" th:text="'Plato ' + ${dish.id}">Plato</h1>
 
@@ -63,7 +63,7 @@
         Nadie ha comentado todavía, sé el primero en escribir una opinión.
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-3" th:unless="${reviews.isEmpty()}">
+    <div id="reviewsGrid" class="row row-cols-1 row-cols-md-2 g-3" th:unless="${reviews.isEmpty()}">
         <div class="col" th:each="review : ${reviews}">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
@@ -71,7 +71,7 @@
                     <p class="card-text" th:text="${review.content}">Descripción</p>
                     <span class="badge bg-warning text-dark">
                         <i class="fa-solid fa-star me-1"></i>
-                        <span th:text="${review.rating + ' / 5'}"></span>
+                        <span class="review-rating" th:text="${review.rating + '/5'}"></span>
                     </span>
                 </div>
                 <div class="card-footer text-muted small bg-transparent">

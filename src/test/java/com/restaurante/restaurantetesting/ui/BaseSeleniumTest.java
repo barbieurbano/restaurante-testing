@@ -12,7 +12,7 @@ import com.restaurante.restaurantetesting.repository.ReviewRepository;
 import com.restaurante.restaurantetesting.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -50,6 +50,7 @@ public class BaseSeleniumTest {
     Dish tiramisu;
     Review pizzeriaOK; //es del restaurante no del plato
     Review pizzeriaMal; //es del restaurante no del plato
+    Review pizzaOK;
     User user, admin;
 
     @BeforeEach
@@ -72,13 +73,14 @@ public class BaseSeleniumTest {
         pizza = dishRepo.save(Dish.builder().name("Pizza 4 Quesos").price(12d).type(DishType.MAIN_COURSE).description("pizza bien").restaurant(pizzeria).build());
         tiramisu = dishRepo.save(Dish.builder().name("Tiramisú Café").price(3d).type(DishType.DESSERT).description("fetén").restaurant(pizzeria).build());
         pizzeriaOK = reviewRepo.save(Review.builder().title("Pectacular").rating(5).restaurant(pizzeria).content("Asombroso").build());
-        pizzeriaMal = reviewRepo.save(Review.builder().title("Fatal").rating(1).dish(pizza).restaurant(pizzeria).content("Nada bien").creationDate(LocalDateTime.now().minusDays(1)).build());
+        pizzeriaMal = reviewRepo.save(Review.builder().title("Fatal").rating(1).restaurant(pizzeria).content("Nada bien").creationDate(LocalDateTime.now().minusDays(1)).build());
+        pizzaOK = reviewRepo.save(Review.builder().title("excelente pizza").rating(5).dish(pizza).content("Okey").creationDate(LocalDateTime.now().minusDays(1)).build());
 
-                // inicializar y configurar driver
-                baseUrl = "http://localhost:" + port + "/";
+        // inicializar y configurar driver
+        baseUrl = "http://localhost:" + port + "/";
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        wait = new WebDriverWait(driver, Duration.ofMillis(30L));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(30L));
     }
 
     @AfterEach
@@ -97,6 +99,10 @@ public class BaseSeleniumTest {
     }
 
     void login(String username, String password){
-
+        driver.get(baseUrl + "login");
+        driver.findElement(By.id("username")).sendKeys(username);
+        driver.findElement(By.id("password")).sendKeys(password);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        wait.until(driver -> driver.getCurrentUrl().equals(baseUrl + "restaurants"));
     }
 }
